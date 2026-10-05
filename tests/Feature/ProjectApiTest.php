@@ -48,4 +48,52 @@ class ProjectApiTest extends TestCase
 
         $this->getJson('/api/projects/brouillon')->assertNotFound();
     }
+
+    public function test_it_returns_french_content_by_default(): void
+    {
+        $this->makeProject(['title_en' => 'English title', 'summary_en' => 'English summary.']);
+
+        $this->getJson('/api/projects')
+            ->assertOk()
+            ->assertJsonPath('data.0.title', 'Projet test')
+            ->assertJsonPath('data.0.summary', 'Un résumé.');
+    }
+
+    public function test_it_returns_english_content_when_requested(): void
+    {
+        $this->makeProject(['title_en' => 'English title', 'summary_en' => 'English summary.']);
+
+        $this->getJson('/api/projects?lang=en')
+            ->assertOk()
+            ->assertJsonPath('data.0.title', 'English title')
+            ->assertJsonPath('data.0.summary', 'English summary.');
+    }
+
+    public function test_it_falls_back_to_french_when_english_is_missing(): void
+    {
+        $this->makeProject();
+
+        $this->getJson('/api/projects?lang=en')
+            ->assertOk()
+            ->assertJsonPath('data.0.title', 'Projet test');
+    }
+
+    public function test_it_ignores_unknown_languages(): void
+    {
+        $this->makeProject(['title_en' => 'English title']);
+
+        $this->getJson('/api/projects?lang=de')
+            ->assertOk()
+            ->assertJsonPath('data.0.title', 'Projet test');
+    }
+
+    public function test_projects_can_be_cached_by_the_browser(): void
+    {
+        $this->makeProject();
+
+        $header = $this->getJson('/api/projects')->headers->get('Cache-Control');
+
+        $this->assertStringContainsString('public', $header);
+        $this->assertStringContainsString('max-age=60', $header);
+    }
 }

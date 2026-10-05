@@ -2,14 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class Project extends Model
 {
     protected $fillable = [
-        'title', 'slug', 'summary', 'description', 'result', 'stack',
-        'image_url', 'github_url', 'demo_url',
+        'title', 'title_en',
+        'slug',
+        'summary', 'summary_en',
+        'description', 'description_en',
+        'result', 'result_en',
+        'stack', 'image_url', 'github_url', 'demo_url',
         'featured', 'is_published', 'position',
     ];
 
@@ -25,5 +29,15 @@ class Project extends Model
     public function scopePublished(Builder $query): Builder
     {
         return $query->where('is_published', true);
+    }
+
+    /** Renvoie la version anglaise d'un champ si elle existe, sinon la version française. */
+    public function localized(string $field, bool $english): ?string
+    {
+        if ($english && filled($this->{$field.'_en'})) {
+            return $this->{$field.'_en'};
+        }
+
+        return $this->{$field};
     }
 }
