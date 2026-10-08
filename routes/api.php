@@ -7,8 +7,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/health', HealthController::class);
 
-Route::get('/projects', [ProjectController::class, 'index']);
-Route::get('/projects/{slug}', [ProjectController::class, 'show']);
+// 60 lectures par minute et par IP au maximum.
+Route::middleware('throttle:reads')->group(function () {
+    Route::get('/projects', [ProjectController::class, 'index']);
+    Route::get('/projects/{slug}', [ProjectController::class, 'show']);
+});
 
-// 5 messages par minute et par IP au maximum.
-Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:5,1');
+// Plafonds définis dans AppServiceProvider : 3 par minute, 20 par jour et par IP, 60 par heure au total.
+Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:contact');

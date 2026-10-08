@@ -15,4 +15,10 @@ class HealthApiTest extends TestCase
             ->assertOk()
             ->assertExactJson(['status' => 'ok', 'database' => true]);
     }
+    public function test_api_responses_carry_security_headers(): void
+    {
+        $this->getJson('/api/health')
+            ->assertHeader('X-Content-Type-Options', 'nosniff')
+            ->assertHeader('Referrer-Policy', 'no-referrer');
+    }
 }

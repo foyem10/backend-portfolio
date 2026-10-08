@@ -19,7 +19,7 @@ class StoreContactMessageRequest extends FormRequest
             'subject' => ['nullable', 'string', 'max:150'],
             'message' => ['required', 'string', 'min:10', 'max:5000'],
             // Champ piège (honeypot) : doit rester vide pour un vrai visiteur.
-            'website' => ['nullable', 'string'],
+            'website' => ['nullable', 'string', 'max:255'],
         ];
     }
 

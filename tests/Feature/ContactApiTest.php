@@ -64,7 +64,7 @@ class ContactApiTest extends TestCase
     {
         Mail::fake();
 
-        for ($i = 0; $i < 5; $i++) {
+        for ($i = 0; $i < 3; $i++) {
             $this->postJson('/api/contact', $this->payload())->assertCreated();
         }
 
